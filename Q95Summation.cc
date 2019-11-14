@@ -1,4 +1,4 @@
-// C++ program to demonstrate the use of std::nth_element 
+// C++ program to demonstrate the use of nth_element 
 #include <iostream> 
 #include <algorithm>
 #include <numeric>
@@ -10,7 +10,7 @@
  * How to SUM the Quartile95 of a list of elements, that is, sum all elements in 
  * the list except the 5% highest values in the list. 
  * 
- * This file uses 2 different approaches: std::nth_element vs std::priority_queue
+ * This file uses 2 different approaches: nth_element vs priority_queue
  * and compares them in terms of performance
  */
 
@@ -19,29 +19,29 @@ int main()
 { 
     int n = 150;
     int numDiscardables = n * 0.05f; // number of values to discard
-    std::vector<int> v1 (n);
+    vector<int> v1 (n);
     auto vBeginIt = v1.begin();
     auto vEndIt   = v1.end();
-    std::generate(vBeginIt, vEndIt, [](){return rand()%100;}); 
+    generate(vBeginIt, vEndIt, [](){return rand()%100;}); 
     
-    std::vector<int> v2 { v1 };
+    vector<int> v2 { v1 };
     
 
     // METHOD 1: nth_element
-    std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
+    chrono::steady_clock::time_point t0 = chrono::steady_clock::now();
     auto vIt = vEndIt - numDiscardables;  // samples that count are [vBegin, vIt]
     if (numDiscardables > 0 )
     {
-        std::nth_element(vBeginIt, vIt, vEndIt);
+        nth_element(vBeginIt, vIt, vEndIt);
     }
-    int sum1 = std::accumulate(vBeginIt, vIt, 0);
+    int sum1 = accumulate(vBeginIt, vIt, 0);
 
-    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-    auto elapsed1 = std::chrono::duration_cast<std::chrono::microseconds>(t1-t0).count();
+    chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
+    auto elapsed1 = chrono::duration_cast<chrono::microseconds>(t1-t0).count();
 
 
     // METHOD 2: priority queue
-    std::priority_queue<int, vector<int>, std::greater <int> > q;
+    priority_queue<int, vector<int>, greater <int> > q;
     int sum2 = 0;
     for (auto sample: v2) {
         sum2 += sample;
@@ -59,11 +59,11 @@ int main()
             }
         }
     }
-    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-    auto elapsed2 = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
+    chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
+    auto elapsed2 = chrono::duration_cast<chrono::microseconds>(t2-t1).count();
     cout << endl;
     
-    std::cout << "sum1=" << sum1 << " calculated in " << elapsed1 <<std::endl;
-    std::cout << "sum2=" << sum2 << " calculated in " << elapsed2 <<std::endl;
+    cout << "sum1=" << sum1 << " calculated in " << elapsed1 <<endl;
+    cout << "sum2=" << sum2 << " calculated in " << elapsed2 <<endl;
 	return 0; 
 } 
