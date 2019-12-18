@@ -1,0 +1,2 @@
+EXPORT DEPOT=armdocker.rnd.ericsson.se/proj_policy/5g/docker_images/depot
+EXPORT NGHTTP2_VER=1.39.2

@@ -1,0 +1,11 @@
+---
+- hosts: dev
+  gather_facts: yes
+  become: yes
+  roles:
+  - geerlingguy.docker
+  - bootstrap
+  - boost
+  - nghttp2
+  - gtest
+  - spdlog

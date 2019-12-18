@@ -1,0 +1,6 @@
+---
+    spdlog_name: spdlog-{{ spdlog_ver }}
+    spdlog_tgz: 'v{{ spdlog_ver }}.tar.gz'
+    spdlog_tgz_url: 'https://github.com/gabime/spdlog/archive/{{ spdlog_tgz }}'
+    spdlog_install_dir: '{{ spdlog_parent_install_dir }}/{{ spdlog_name }}'
+    spdlog_link_dir: '{{ spdlog_parent_install_dir }}/spdlog'

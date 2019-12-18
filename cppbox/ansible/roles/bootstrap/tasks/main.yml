@@ -1,0 +1,49 @@
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: install requirements
+  package:
+    name: "{{item}}"
+    state: present
+  with_items:
+   - vim
+   - git
+   - python3-pip
+   - socat
+   - htop
+   - libcunit1-dev
+   - libssl-dev
+   - libc-ares-dev
+   - libevent-openssl-2.1-6
+   - libjansson-dev
+   - libsystemd-dev
+   - libxml2-dev 
+   - libev-dev
+   - libtool 
+   - pkg-config
+   - cmake
+
+- name: install pip packages
+  pip:
+    name: "{{item}}"
+  with_items:
+    - openshift
+
+- name: adding existing user vagrant to group docker
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+
+# - name: Patch coredns configmap
+#   shell: |
+#     kubectl patch deployment -n=kube-system coredns -p '{"spec": {"template": {"spec":{"containers":[{"image":"k8s.gcr.io/coredns:1.2.2", "name":"coredns","resources":{"limits":{"memory":"2Gi"},"requests":{"cpu":"100m","memory":"70Mi"}}}]}}}}'
+#     kubectl get -o yaml -n kube-system cm coredns | grep -v loop | kubectl apply -f -
+#     kubectl -n kube-system delete pod -l k8s-app=kube-dns

@@ -1,0 +1,48 @@
+VAGRANTFILE_API_VERSION = "2"
+
+
+# Define constants
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Use vagrant-env plugin if available
+  if Vagrant.has_plugin?("vagrant-env")
+    config.env.load('.env')
+  end
+
+  # ENV variables defaults
+  VAGRANT_CPP_BASE_IMAGE_BOX = ENV.fetch('VAGRANT_CPP_BASE_IMAGE_BOX', "ubuntu/bionic64").to_s
+  VAGRANT_CPP_CPUS = ENV.fetch('VAGRANT_CPP_CPUS', 2).to_i
+  VAGRANT_CPP_MEMORY = ENV.fetch('VAGRANT_CPP_MEMORY', 2048).to_i
+  VAGRANT_CPP_DISKSIZE =  ENV.fetch('VAGRANT_CPP_DISKSIZE', '10GB').to_s
+
+  config.vm.define "dev", primary: true do |dev|
+    dev.vm.box = VAGRANT_CPP_BASE_IMAGE_BOX
+    if Vagrant.has_plugin?("vagrant-disksize")
+      dev.disksize.size = VAGRANT_CPP_DISKSIZE
+    end
+    dev.vm.network "private_network", ip: "192.168.99.90"
+    dev.vm.network "forwarded_port", guest: 8080, host: 8088
+
+    dev.vm.provider :virtualbox do |v|
+      v.memory = VAGRANT_CPP_MEMORY
+      v.cpus = VAGRANT_CPP_CPUS
+    end
+
+    dev.vm.synced_folder "/git", "/git"
+
+    dev.vm.provision "ansible_local" do |ansible|
+      ansible.config_file = "ansible/ansible.cfg"
+      ansible.playbook = "ansible/main.yml"
+      ansible.limit = "all"
+      ansible.galaxy_role_file = "ansible/requirements.yml"
+      ansible.galaxy_roles_path = "/home/vagrant/.ansible/roles"
+      ansible.extra_vars = {
+        ansible_ssh_user: 'vagrant',
+        ansible_ssh_pass: 'vagrant',
+        ansible_python_interpreter: '/usr/bin/python3'
+      }
+      ansible.groups = {}
+      ansible.verbose = false
+    end
+  end
+end

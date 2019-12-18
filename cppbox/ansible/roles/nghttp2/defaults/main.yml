@@ -1,0 +1,3 @@
+nghttp2_ver: '1.39.2'
+nghttp2_mirror: https://github.com/nghttp2/nghttp2/releases/download
+nghttp2_parent_install_dir: /usr/local

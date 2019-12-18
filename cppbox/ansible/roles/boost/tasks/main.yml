@@ -1,0 +1,48 @@
+---
+    - name: Check for boost install
+      become: yes
+      become_user: root
+      stat:
+        path: '{{ boost_install_dir }}'
+      changed_when: False
+      register: boost_binary
+    - when: not boost_binary.stat.exists
+      block:
+        - name: Download boost tarball
+          become: yes
+          become_user: root
+          get_url:
+            url: '{{ boost_tgz_url }}'
+            dest: /tmp/{{ boost_tgz }}
+            #checksum: '{{ boost_checksum }}'
+            mode: 0644
+        - name: Unarchive boost tarball
+          become: yes
+          become_user: root
+          unarchive:
+            remote_src: yes
+            src: /tmp/{{ boost_tgz }}
+            dest: '{{ boost_parent_install_dir }}'
+            creates: '{{ boost_install_dir }}'
+        - name: boostrap boost
+          become: yes
+          become_user: root
+          shell: "cd {{ boost_install_dir }} && ./bootstrap.sh --prefix=/usr/local                                                                  \
+                     --with-libraries=program_options,thread,system,regex,filesystem,log,date_time,chrono,atomic  && \
+                  ./b2 link=static threading=multi cxxflags='-std=c++14' install"
+      always:
+        - name: Clean up boost tmp directory
+          become: yes
+          become_user: root
+          file:
+            path: /tmp/{{ boost_tgz }}
+            state: absent
+    
+    - name: Create link to boost directory
+      become: yes
+      become_user: root
+      file:
+        src: '{{ boost_install_dir }}'
+        dest: '{{ boost_link_dir }}'
+        state: link
+   

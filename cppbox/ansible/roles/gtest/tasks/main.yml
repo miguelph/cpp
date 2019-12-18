@@ -1,0 +1,46 @@
+---
+    - name: Check for gtest install
+      become: yes
+      become_user: root
+      stat:
+        path: '{{ gtest_install_dir }}'
+      changed_when: False
+      register: gtest_binary
+    - when: not gtest_binary.stat.exists
+      block:
+        - name: Download gtest tarball
+          become: yes
+          become_user: root
+          get_url:
+            url: '{{ gtest_tgz_url }}'
+            dest: /tmp/{{ gtest_tgz }}
+            #checksum: '{{ gtest_checksum }}'
+            mode: 0644
+        - name: Unarchive gtest tarball
+          become: yes
+          become_user: root
+          unarchive:
+            remote_src: yes
+            src: /tmp/{{ gtest_tgz }}
+            dest: '{{ gtest_parent_install_dir }}'
+            creates: '{{ gtest_install_dir }}'
+        - name: build gtest
+          become: yes
+          become_user: root
+          shell: "cd {{ gtest_install_dir}} && cmake . && make -j 2 install"
+      always:
+        - name: Clean up gtest tmp directory
+          become: yes
+          become_user: root
+          file:
+            path: /tmp/{{ gtest_tgz }}
+            state: absent
+    
+    - name: Create link to gtest directory
+      become: yes
+      become_user: root
+      file:
+        src: '{{ gtest_install_dir }}'
+        dest: '{{ gtest_link_dir }}'
+        state: link
+   

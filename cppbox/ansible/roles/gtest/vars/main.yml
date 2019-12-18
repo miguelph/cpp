@@ -1,0 +1,6 @@
+---
+    gtest_name: 'googletest-release-{{gtest_ver}}'
+    gtest_tgz: 'release-{{gtest_ver}}.tar.gz'
+    gtest_tgz_url: '{{ gtest_mirror }}/{{ gtest_tgz }}'
+    gtest_install_dir: '{{ gtest_parent_install_dir }}/{{ gtest_name }}'
+    gtest_link_dir: '{{ gtest_parent_install_dir }}/gtest'

@@ -1,0 +1,52 @@
+---
+    - name: Check for spdlog install
+      become: yes
+      become_user: root
+      stat:
+        path: '{{ spdlog_install_dir }}'
+      changed_when: False
+      register: spdlog_binary
+    - when: not spdlog_binary.stat.exists
+      block:
+        - name: Download spdlog tarball
+          become: yes
+          become_user: root
+          get_url:
+            url: '{{ spdlog_tgz_url }}'
+            dest: /tmp/{{ spdlog_tgz }}
+            #checksum: '{{ spdlog_checksum }}'
+            mode: 0644
+        - name: Unarchive spdlog tarball
+          become: yes
+          become_user: root
+          unarchive:
+            remote_src: yes
+            src: /tmp/{{ spdlog_tgz }}
+            dest: '{{ spdlog_parent_install_dir }}'
+            creates: '{{ spdlog_install_dir }}'
+        - name: build spdlog
+          become: yes
+          become_user: root
+          shell: "cd {{ spdlog_install_dir}} && \
+                  mkdir build && cd build && \
+                  cmake .. -DCMAKE_BUILD_TYPE=Release -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_SETUP_INCLUDE_UNIT_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install && \
+                  cmake --build . --target install                                                                 && \
+                  cp -r {{ spdlog_install_dir}}/include/spdlog /usr/local/include/                          && \
+                  cp -r {{ spdlog_install_dir}}/build/install/include/spdlog/* /usr/local/include/          && \
+                  cp -r {{ spdlog_install_dir}}/build/install/lib/spdlog/* /usr/local/lib/"
+      always:
+        - name: Clean up spdlog tmp directory
+          become: yes
+          become_user: root
+          file:
+            path: /tmp/{{ spdlog_tgz }}
+            state: absent
+    
+    - name: Create link to spdlog directory
+      become: yes
+      become_user: root
+      file:
+        src: '{{ spdlog_install_dir }}'
+        dest: '{{ spdlog_link_dir }}'
+        state: link
+   

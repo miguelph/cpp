@@ -1,0 +1,6 @@
+---
+    boost_name: boost_{{ boost_ver_undersc }}
+    boost_tgz: '{{ boost_name }}.tar.gz'
+    boost_tgz_url: '{{ boost_mirror }}/{{ boost_ver }}/source/{{ boost_tgz }}'
+    boost_install_dir: '{{ boost_parent_install_dir }}/{{ boost_name }}'
+    boost_link_dir: '{{ boost_parent_install_dir }}/boost'

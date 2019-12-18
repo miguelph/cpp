@@ -1,0 +1,46 @@
+---
+    - name: Check for nghttp2 install
+      become: yes
+      become_user: root
+      stat:
+        path: '{{ nghttp2_install_dir }}'
+      changed_when: False
+      register: nghttp2_binary
+    - when: not nghttp2_binary.stat.exists
+      block:
+        - name: Download nghttp2 tarball
+          become: yes
+          become_user: root
+          get_url:
+            url: '{{ nghttp2_tgz_url }}'
+            dest: /tmp/{{ nghttp2_tgz }}
+            #checksum: '{{ nghttp2_checksum }}'
+            mode: 0644
+        - name: Unarchive nghttp2 tarball
+          become: yes
+          become_user: root
+          unarchive:
+            remote_src: yes
+            src: /tmp/{{ nghttp2_tgz }}
+            dest: '{{ nghttp2_parent_install_dir }}'
+            creates: '{{ nghttp2_install_dir }}'
+        - name: build nghttp2
+          become: yes
+          become_user: root
+          shell: "cd {{ nghttp2_install_dir}} && ./configure --enable-asio-lib --enable-app --disable-shared  && make -j 2 install"
+      always:
+        - name: Clean up nghttp2 tmp directory
+          become: yes
+          become_user: root
+          file:
+            path: /tmp/{{ nghttp2_tgz }}
+            state: absent
+    
+    - name: Create link to nghttp2 directory
+      become: yes
+      become_user: root
+      file:
+        src: '{{ nghttp2_install_dir }}'
+        dest: '{{ nghttp2_link_dir }}'
+        state: link
+   

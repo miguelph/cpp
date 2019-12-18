@@ -1,0 +1,6 @@
+---
+    nghttp2_name: nghttp2-{{ nghttp2_ver }}
+    nghttp2_tgz: '{{ nghttp2_name }}.tar.gz'
+    nghttp2_tgz_url: '{{ nghttp2_mirror }}/v{{ nghttp2_ver }}/{{ nghttp2_tgz }}'
+    nghttp2_install_dir: '{{ nghttp2_parent_install_dir }}/{{ nghttp2_name }}'
+    nghttp2_link_dir: '{{ nghttp2_parent_install_dir }}/nghttp2'

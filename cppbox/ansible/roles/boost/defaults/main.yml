@@ -1,0 +1,5 @@
+boost_ver: '1.71.0'
+boost_ver_undersc: '1_71_0'
+boost_mirror: https://dl.bintray.com/boostorg/release/
+boost_parent_install_dir: /usr/local
+
